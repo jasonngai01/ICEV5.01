@@ -46,6 +46,8 @@ float H2_hall_count=0;
 float H3_hall_count=0;
 float H4_hall_count=0;
 
+int anchor = false;
+
 void setup()
 {
   Serial.begin(9600);
@@ -100,6 +102,7 @@ void bluetooth_control()
      if(RX_Message == 'A')
      {
        start_flag = true;
+       anchor = false;
        //Serial.print("Start\r\n");
      }else if(RX_Message == 'B')
             {
@@ -122,12 +125,15 @@ int zRead = analogRead(zPin);
 
 float xvoltage = xRead * 5./1023;
 float Gx = (xvoltage - 2.5) / 0.36;
+float capture_Gx = 0.0;
 
 float yvoltage = yRead * 5./1023;
 float Gy = (yvoltage - 2.5) / 0.36;
+float capture_Gy = 0.0;
 
 float zvoltage = zRead * 5./1023;
 float Gz = (zvoltage - 2.5) / 0.36;
+float capture_Gz = 0.0;
 
 
 bluetooth_control();
@@ -186,7 +192,30 @@ bluetooth_control();
       Serial.print(Gy);
       Serial.print (" ");
       Serial.println(Gz);     
-    }
+    }else{
+           if(anchor==false)
+           {
+             capture_Gz = Gz;
+             capture_Gy = Gy;
+             capture_Gx = Gx;
+             Serial.print("Capture Gx:");
+             Serial.print(capture_Gx);
+             Serial.print(" Capture Gy:");
+             Serial.print(capture_Gy);
+             Serial.print(" Capture Gz:");
+             Serial.print(capture_Gz);
+             Serial.print("\r\n");
+
+             Serial.print("Cal Gx:");
+             Serial.print(Gx - capture_Gx);
+             Serial.print(" Cal Gy:");
+             Serial.print(Gx - capture_Gy);
+             Serial.print(" Cal Gz:");
+             Serial.print(Gx - capture_Gz);
+             Serial.print("\r\n");
+             anchor = true;
+           }
+         }
     t = now;
     count++;
 
