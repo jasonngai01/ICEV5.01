@@ -55,8 +55,8 @@ int anchor = false;
 
 void setup()
 {
-  Serial.begin(9600);
-  Serial3.begin(9600);
+  Serial.begin(115200);
+  Serial3.begin(115200);
   
   H1.init(18);
   H2.init(19);
@@ -290,7 +290,7 @@ bluetooth_control();
     t = now;
     count++;
 
-    if((count % 10 == 0)&&(start_flag == true))
+    if((count % 1 == 0)&&(start_flag == true))
     {
       float end_time = now;
       float time_passed = ((end_time-start)/1000.0);
