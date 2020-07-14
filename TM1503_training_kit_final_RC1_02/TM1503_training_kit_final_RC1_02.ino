@@ -21,6 +21,9 @@ double z;
 char RX_Message = 'X';
 bool start_flag = false;
 bool initialize = false;
+float new_gx;
+float new_gy;
+float new_gz;
 
   
 int hallout_pin = 0; // use D0 pin
@@ -98,52 +101,72 @@ void abc()
 
 void bluetooth_control()
 {
-  while (Serial3.available())
+  while (Serial.available())
   {
-     RX_Message = Serial3.read();    
+     RX_Message = Serial.read();    
      if(RX_Message == 'A')
      {
        start_flag = true;
        anchor = false;
-       //Serial.print("Start\r\n");
+       Serial.print("Start\r\n");
      }else if(RX_Message == 'B')
             {
               start_flag = false;
-              //Serial.print("Stop\r\n");
+              Serial.print("Stop\r\n");
             }
     RX_Message = 'X';
   }  
 }
 
-int curve_plotting(float a,float b,float c)
+int curve_plotting(float a,float b,float c,float rpm_1,float rpm_2, float rpm_3, float rpm_4)
 {
   int first;
   int second;
   int third;
-  Serial.print("$");
+  int r1;
+  int r2;
+  int r3;
+  int r4;
+  Serial3.print("$");
   first = abs(a)*100;
   if(a<0)
   {
-    Serial.print("-");
+    Serial3.print("-");
   }
-  Serial.print(first);
-  Serial.print(" ");
+  Serial3.print(first);
+  Serial3.print(" ");
   
   second = abs(b)*100;
   if(b<0)
   {
-    Serial.print("-");
+    Serial3.print("-");
   }
-  Serial.print(second);
-  Serial.print(" ");
+  Serial3.print(second);
+  Serial3.print(" ");
 
   third = abs(c)*100;
   if(c<0)
   {
-    Serial.print("-");
+    Serial3.print("-");
   }
-  Serial.print(third); 
-  Serial.print(";"); 
+  Serial3.print(third);
+  Serial3.print(" "); 
+
+
+  //plot rpm
+  r1 = rpm_1;
+  r2 = rpm_2;
+  r3 = rpm_3;
+  r4 = rpm_4;
+  Serial3.print(r1);
+  Serial3.print(" "); 
+  Serial3.print(r2);
+  Serial3.print(" ");
+  Serial3.print(r3);
+  Serial3.print(" ");
+  Serial3.print(r4);
+  Serial3.print(" ");
+  Serial3.print(";"); 
   return 0;
 }
 
@@ -236,13 +259,11 @@ bluetooth_control();
       Serial.print (" ");
       Serial.println(Gz); 
       **/
-      float new_gx;
-      float new_gy;
-      float new_gz;
+
       new_gx = Gx - capture_Gx + 2.6;
       new_gy = Gy - capture_Gy + 2.6;
       new_gz = Gz - capture_Gz + 3.5;
-      curve_plotting(new_gx,new_gy,new_gz);
+      //curve_plotting(new_gx,new_gy,new_gz);
       //curve_plotting(-100,100,-13);
           
     }else{
@@ -281,24 +302,28 @@ bluetooth_control();
       Serial.println("s");
       
       float rpm_val = (H1_hall_count/time_passed)*60.0;
+      float rp_1 = rpm_val;
       Serial3.print(rpm_val);
       Serial3.print(" H1_RPM  ");
       Serial.print(rpm_val);
       Serial.print(" H1_RPM  ");
   
       rpm_val = (H2_hall_count/time_passed)*60.0;
+      float rp_2 = rpm_val;
       Serial3.print(rpm_val);
       Serial3.print(" H2_RPM  ");
       Serial.print(rpm_val);
       Serial.print(" H2_RPM  ");
       
       rpm_val = (H3_hall_count/time_passed)*60.0;
+      float rp_3 = rpm_val;
       Serial3.print(rpm_val);
       Serial3.print(" H3_RPM  ");
       Serial.print(rpm_val);
       Serial.print(" H3_RPM  ");  
       
       rpm_val = (H4_hall_count/time_passed)*60.0;
+      float rp_4 = rpm_val;
       Serial3.print(rpm_val);
       Serial3.println(" H4_RPM");
       Serial.print(rpm_val);
@@ -308,7 +333,8 @@ bluetooth_control();
       H2_hall_count=0;
       H3_hall_count=0;
       H4_hall_count=0;
-      
+
+      curve_plotting(new_gx,new_gy,new_gz,rp_1,rp_2,rp_3,rp_4);
       start = now;
     }
   }
